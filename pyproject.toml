@@ -11,6 +11,8 @@ pandas = "^1.2.4"
 matplotlib = "^3.4.2"
 google-cloud-storage = "^1.38.0"
 slackweb = "^1.0.5"
+redis = "^3.5.3"
+pytest = "^6.2.4"
 
 [tool.poetry.dev-dependencies]
 
