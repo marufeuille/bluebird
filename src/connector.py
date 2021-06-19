@@ -51,6 +51,7 @@ if __name__ == "__main__":
             sensor_value = get_ibsth1_mini_data(args.macaddr)
             print(f"{datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}, {sensor_value.temperature}, {sensor_value.humidity}")
             
+            # TODO: Parameterize
             if check_temperature(sensor_value, 28, CompareOp.GT):
                 rds = redis.Redis(host=args.redis_url, port=args.redis_port, db=args.redis_db)
                 value = rds.get("count")
@@ -64,6 +65,7 @@ if __name__ == "__main__":
                     slack.notify(text=f"temperature exceed 28C 5times")
                 rds.set("count", value)
             else:
+                rds = redis.Redis(host=args.redis_url, port=args.redis_port, db=args.redis_db)
                 rds.set("count", 0)
             break
         except ConnectionError:
