@@ -12,7 +12,7 @@ from bluepy import btle
 
 SensorData = namedtuple('SensorData', ['temperature', 'humidity'])
 
-def get_ibsth1_mini_data(macaddr: str) -> SensorData:
+def get_ibsth1_data(macaddr: str) -> SensorData:
     try:
         peripheral = btle.Peripheral(macaddr)
         characteristic = peripheral.readCharacteristic(0x0028)
@@ -48,7 +48,7 @@ if __name__ == "__main__":
     retry_after: int = args.retry_after
     for _ in range(max_retry):
         try:
-            sensor_value = get_ibsth1_mini_data(args.macaddr)
+            sensor_value = get_ibsth1_data(args.macaddr)
             print(f"{datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}, {sensor_value.temperature}, {sensor_value.humidity}")
             
             # TODO: Parameterize

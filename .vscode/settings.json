@@ -1,4 +1,7 @@
 {
     "python.pythonPath": ".venv/bin/python",
     "python.envFile": ".vscode/.env",
+    "python.analysis.extraPaths": [
+        "src/"
+    ]
 }
