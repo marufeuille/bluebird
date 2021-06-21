@@ -13,8 +13,7 @@ class SamplingRate(Enum):
 
 
 def draw_days_ago_graph(df: pd.DataFrame, output_path: str="/tmp/img.png",days_ago:int=1, sampling_rate: SamplingRate=SamplingRate.HOUR) -> None:
-    day_ago = datetime.datetime.now() - datetime.timedelta(days=days_ago)
-    target = df.loc[f'{day_ago.year}-{day_ago.month}-{day_ago.day}'].resample(sampling_rate.value).mean()
+    target = df.resample(sampling_rate.value).mean()
     fig, axs = plt.subplots(2,1, figsize=(12, 8))
     for idx, name in enumerate(['temperature', 'humidity']):
         axs[idx].plot(target[name])

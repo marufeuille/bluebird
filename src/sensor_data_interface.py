@@ -7,7 +7,7 @@ from datetime import datetime
 
 SensorData = namedtuple('SensorData', ['datetime', 'temperature', 'humidity'])
 
-class SensorDataInterface(metaclass=ABCMeta):
+class SensorDataRepositoryInterface(metaclass=ABCMeta):
     @abstractmethod
     def save(self, data: SensorData) -> None:
         pass

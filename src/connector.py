@@ -9,8 +9,8 @@ import redis
 import slackweb
 from bluepy import btle
 
-
-SensorData = namedtuple('SensorData', ['temperature', 'humidity'])
+from sensor_data_interface import SensorData
+from sqlite_sensor_data import SQliteSensorDataRepository
 
 def get_ibsth1_data(macaddr: str) -> SensorData:
     try:
@@ -18,7 +18,10 @@ def get_ibsth1_data(macaddr: str) -> SensorData:
         characteristic = peripheral.readCharacteristic(0x0028)
         temperature = int.from_bytes(characteristic[0:2], "little") / 100
         humidity = int.from_bytes(characteristic[2:4], "little") / 100
-        return SensorData(temperature, humidity)
+        now = datetime.datetime.strptime(
+            datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "%Y-%m-%d %H:%M:%S")
+        return SensorData(now, temperature, humidity)
     except btle.BTLEDisconnectError:
         raise ConnectionError("Peripheral did not connect.")
 
@@ -43,13 +46,16 @@ if __name__ == "__main__":
     parser.add_argument('--redis_url', type=str, required=False, default="localhost")
     parser.add_argument('--redis_port',type=int, required=False, default=6379)
     parser.add_argument('--redis_db', type=int, required=False, default=0)
+    parser.add_argument('--db_path', type=str, required=True, default=0)
     args = parser.parse_args()
     max_retry: int = args.max_retry
     retry_after: int = args.retry_after
+    sensor_data_repo = SQliteSensorDataRepository(args.db_path)
     for _ in range(max_retry):
         try:
             sensor_value = get_ibsth1_data(args.macaddr)
-            print(f"{datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}, {sensor_value.temperature}, {sensor_value.humidity}")
+            sensor_data_repo.save(sensor_value)
+            print(f"{sensor_value.datetime}, {sensor_value.temperature}, {sensor_value.humidity}")
             
             # TODO: Parameterize
             if check_temperature(sensor_value, 28, CompareOp.GT):

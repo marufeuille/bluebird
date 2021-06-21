@@ -7,22 +7,27 @@ from google.cloud import storage
 from google.oauth2 import service_account
 import slackweb
 
-
 from drawer import draw_days_ago_graph
+from sqlite_sensor_data import SQliteSensorDataRepository
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="")
-    parser.add_argument('--input_csv', type=str, required=True)
     parser.add_argument('--output_path', type=str, required=False, default="img.png")
     parser.add_argument('--days_ago', type=int, required=False, default=1)
     parser.add_argument('--gcp_sa_json', type=str, required=False)
     parser.add_argument('--gcs_bucket_name', type=str, required=True)
     parser.add_argument('--gcs_project', type=str, required=True)
     parser.add_argument('--slack_webhook_url', type=str, required=True)
+    parser.add_argument('--db_path', type=str, required=True)
     args = parser.parse_args()
 
-    df = pd.read_csv(args.input_csv, names=('datetime', 'temperature', 'humidity')) \
-            .dropna().reset_index(drop=True)
+    sqlite_sensor_data_repository = SQliteSensorDataRepository(args.db_path)
+    now = datetime.datetime.now()
+    today = datetime.datetime(year=now.year, month=now.month, day=now.day)
+    days_ago = today - datetime.timedelta(days=args.days_ago)
+    data = sqlite_sensor_data_repository.fetch_data(from_datetime=days_ago, to_datetime=today)
+    
+    df = pd.DataFrame(data)
     df['datetime'] = pd.to_datetime(df['datetime'])
     df.set_index('datetime', inplace=True)
     draw_days_ago_graph(df, output_path=args.output_path ,days_ago=args.days_ago)
