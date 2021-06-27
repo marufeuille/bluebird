@@ -22,12 +22,12 @@ class SQliteSensorDataRepository(SensorDataRepositoryInterface):
         cur = self._con.cursor()
         query = f"""
         SELECT
-            date AS date, temperature, humidity
+            datetime, temperature, humidity
         FROM
             medaka01
         WHERE
-            date >= '{from_datetime}'
-            AND date < '{to_datetime}'
+            datetime >= '{from_datetime}'
+            AND datetime < '{to_datetime}'
         """
         results: List[SensorData] = []
         for row in cur.execute(query):
