@@ -3,5 +3,9 @@
     "python.envFile": ".vscode/.env",
     "python.analysis.extraPaths": [
         "src/"
-    ]
+    ],
+    "files.associations": {
+        "*.ttml": "xml",
+        "*.ttss": "css"
+    }
 }
